@@ -3,6 +3,7 @@ import telebot from 'telebot';
 import * as indicators from 'trading-indicator';
 import { INDODAX_BASE_URL, COMMAND_LIST, EXCHANGE_CODE } from './constant';
 import { ECOMMAND_LIST, EHTTP_METHOD } from './interface';
+import { formatCurrency } from './utils';
 import APIService from './service';
 
 const cryptoBot = new telebot({
@@ -101,7 +102,9 @@ cryptoBot.on(COMMAND_LIST, async (msg) => {
     }
   } else if (command === ECOMMAND_LIST.RSI_ALERT) {
     try {
+
       const timeframe = msg.text.split(' ')[2];
+      console.log(timeframe)
       const res = await indicators.alerts.rsiCheck(
         14,
         70,
@@ -116,6 +119,20 @@ cryptoBot.on(COMMAND_LIST, async (msg) => {
         msg,
         `${pair.toUpperCase()}\nRSI value: ${res.rsiVal}\n\nOverbought: ${res.overBought}\nOversold: ${res.overSold}`
       );
+    } catch (err) {
+      sendErrMessage(msg, err)
+    }
+  } else if (command === ECOMMAND_LIST.FETCH_TICKER) {
+    try {
+      const res = await indicators.ticker(
+        EXCHANGE_CODE,
+        pair.toUpperCase(),
+        false,
+      );
+      sendSuccesMessage(
+        msg,
+        `${pair.toUpperCase()} - ${new Date(res.timestamp)}\n\nHigh: ${formatCurrency(res.high)}\nLow: ${formatCurrency(res.low)}\nClose: ${formatCurrency(res.close)}\nOpen: ${formatCurrency(res.open)}\nVol base 24h: ${res.baseVolume}`
+      )
     } catch (err) {
       sendErrMessage(msg, err)
     }

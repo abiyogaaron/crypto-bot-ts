@@ -10,6 +10,7 @@ export enum ECOMMAND_LIST {
   ORDER_BOOK = '/checktrades',
   MA_CROSSING = '/macross',
   RSI_ALERT = '/rsialert',
+  FETCH_TICKER = '/fetchticker',
 }
 
 export type TCommandList = ECOMMAND_LIST;
